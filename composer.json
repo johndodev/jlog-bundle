@@ -1,0 +1,31 @@
+{
+    "description": "Easy logging.",
+    "homepage": "https://jlog.io",
+    "name": "johndodev/jlog-bundle",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": ["log", "logging", "bundle", "symfony"],
+    "authors": [
+        {
+            "name": "Johndodev",
+            "homepage": "https://jonathan-plantey.fr/"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.1",
+        "monolog/monolog": "^3.0",
+        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/http-client": "^6.4|^7.0"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Johndodev\\JlogBundle\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Symfony\\JlogBundle\\Tests\\": "tests/" }
+    }
+}
