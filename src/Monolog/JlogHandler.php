@@ -12,7 +12,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class JlogHandler extends AbstractProcessingHandler
 {
-    private const ENDPOINT = 'https://jlog.dev/logs';
+    private const ENDPOINT = 'https://jlog.io/logs';
 
     private HttpClientInterface $httpClient;
     private string $projectApiKey;
