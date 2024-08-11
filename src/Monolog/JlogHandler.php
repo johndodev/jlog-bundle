@@ -13,6 +13,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class JlogHandler extends AbstractProcessingHandler
 {
     private const ENDPOINT = 'https://jlog.io/logs';
+//    private const ENDPOINT = 'https://jlog.dev/logs';
 
     private HttpClientInterface $httpClient;
     private string $projectApiKey;
@@ -36,7 +37,16 @@ class JlogHandler extends AbstractProcessingHandler
 
     public function handleBatch(array $records): void
     {
-        $this->send($this->getFormatter()->formatBatch($records));
+        // waiting https://github.com/Seldaek/monolog/pull/1906
+//        $this->send($this->getFormatter()->formatBatch($records));
+
+        $output = [];
+
+        foreach ($records as $record) {
+            $output[] = json_decode($this->getFormatter()->format($record), true);
+        }
+
+        $this->send($output);
     }
 
     protected function write(LogRecord $record): void
@@ -51,7 +61,8 @@ class JlogHandler extends AbstractProcessingHandler
                 'X-API-KEY' => $this->projectApiKey,
                 'Content-Type' => 'application/json',
             ],
-            'body' => $data,
+            'json' => $data,
+//            'body' => $data,
         ]);
     }
 
