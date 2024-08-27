@@ -12,13 +12,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class JlogHandler extends AbstractProcessingHandler
 {
-    private const ENDPOINT = 'https://jlog.io/logs';
-//    private const ENDPOINT = 'https://jlog.dev/logs';
+    private const DEFAULT_ENDPOINT = 'https://jlog.io/logs';
 
     private HttpClientInterface $httpClient;
     private string $projectApiKey;
+    private string $endpoint;
 
-    public function __construct(string $projectApiKey, HttpClientInterface $httpClient)
+    public function __construct(string $projectApiKey, HttpClientInterface $httpClient, ?string $endpoint = null)
     {
         parent::__construct();
 
@@ -28,6 +28,7 @@ class JlogHandler extends AbstractProcessingHandler
 
         $this->httpClient = $httpClient;
         $this->projectApiKey = $projectApiKey;
+        $this->endpoint = $endpoint ?? self::DEFAULT_ENDPOINT;
     }
 
     public function handle(LogRecord $record): bool
@@ -63,6 +64,7 @@ class JlogHandler extends AbstractProcessingHandler
             ],
             'json' => $data,
 //            'body' => $data,
+            'verify_peer' => $this->endpoint === self::DEFAULT_ENDPOINT,
         ]);
     }
 
