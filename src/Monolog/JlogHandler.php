@@ -57,7 +57,7 @@ class JlogHandler extends AbstractProcessingHandler
 
     protected function send($data): void
     {
-        $this->httpClient->request('POST', self::ENDPOINT, [
+        $this->httpClient->request('POST', $this->endpoint, [
             'headers' => [
                 'X-API-KEY' => $this->projectApiKey,
                 'Content-Type' => 'application/json',

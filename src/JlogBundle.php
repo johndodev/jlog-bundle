@@ -2,6 +2,7 @@
 
 namespace Johndodev\JlogBundle;
 
+use Johndodev\JlogBundle\Console\ConsoleEventListener;
 use Johndodev\JlogBundle\EventListener\ExceptionListener;
 use Johndodev\JlogBundle\Monolog\JlogHandler;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -17,8 +18,6 @@ class JlogBundle extends AbstractBundle
 {
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-//        $container->parameters()->set('jlog.project_api_key', $config['project_api_key']);
-
         $container->services()->set('jlog.monolog_handler')
             ->class(JlogHandler::class)
             ->args([
@@ -26,6 +25,16 @@ class JlogBundle extends AbstractBundle
                 '$httpClient' => service(HttpClientInterface::class),
                 '$endpoint' => $config['endpoint'],
             ])
+        ;
+
+        $container->services()->set('jlog.console_listener')
+            ->class(ConsoleEventListener::class)
+            ->args([
+                '$logger' => service('monolog.logger.'.$config['console_channel']),
+            ])
+            ->tag('kernel.event_listener', ['event' => 'console.command', 'method' => 'onCommandStart'])
+            ->tag('kernel.event_listener', ['event' => 'console.error', 'method' => 'onCommandError'])
+            ->tag('kernel.event_listener', ['event' => 'console.terminate', 'method' => 'onCommandTerminate'])
         ;
 
         if ($config['enable_exception_listener']) {
@@ -46,6 +55,7 @@ class JlogBundle extends AbstractBundle
             ->children() // jlog
                 ->scalarNode('project_api_key')->isRequired()->end()
                 ->scalarNode('endpoint')->defaultNull()->end()
+                ->scalarNode('console_channel')->defaultValue('console')->end()
                 ->booleanNode('enable_exception_listener')->defaultTrue()->end()
                 ->arrayNode('ignore_exceptions')->scalarPrototype()->end()
             ->end()
