@@ -2,6 +2,7 @@
 
 namespace Johndodev\JlogBundle;
 
+use Johndodev\JlogBundle\Command\TestLogCommand;
 use Johndodev\JlogBundle\Console\ConsoleEventListener;
 use Johndodev\JlogBundle\EventListener\ExceptionListener;
 use Johndodev\JlogBundle\Monolog\JlogHandler;
@@ -36,6 +37,14 @@ class JlogBundle extends AbstractBundle
             ->tag('kernel.event_listener', ['event' => 'console.error', 'method' => 'onCommandError'])
             ->tag('kernel.event_listener', ['event' => 'console.terminate', 'method' => 'onCommandTerminate'])
         ;
+
+        // enregistre la commande test
+        $container->services()->set('jlog.command.test_log')
+            ->class(TestLogCommand::class)
+            ->args([
+                '$logger' => service('monolog.logger'),
+            ])
+            ->tag('console.command');
 
         if ($config['enable_exception_listener']) {
             $container->services()->set('jlog.exception_listener')
