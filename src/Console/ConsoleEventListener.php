@@ -77,7 +77,7 @@ class ConsoleEventListener
             'arguments' => $this->normalizeArguments($event->getInput()),
         ];
 
-        if ($withOutput) {
+        if ($withOutput && $event->getCommand()) {
             $context['output'] = $this->getOutput($event->getCommand());
         }
 
