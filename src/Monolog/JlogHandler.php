@@ -45,6 +45,9 @@ class JlogHandler extends AbstractProcessingHandler
 
         foreach ($records as $record) {
             $output[] = json_decode($this->getFormatter()->format($record), true);
+
+            // pas besoin
+            unset($output['level_name']);
         }
 
         $this->send($output);

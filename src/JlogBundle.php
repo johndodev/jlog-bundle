@@ -59,6 +59,9 @@ class JlogBundle extends AbstractBundle
         }
     }
 
+    /**
+     * https://symfony.com/doc/current/components/config/definition.html
+     */
     public function configure(DefinitionConfigurator $definition): void
     {
         $definition->rootNode()
