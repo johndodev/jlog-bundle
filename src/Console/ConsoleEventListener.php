@@ -13,6 +13,7 @@ use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Log les events des commandes SF (les commandes lancées, les erreurs, ...)
@@ -25,10 +26,12 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 class ConsoleEventListener
 {
     private LoggerInterface $logger;
+    private Stopwatch $stopwatch;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, Stopwatch $stopwatch)
     {
         $this->logger = $logger;
+        $this->stopwatch = $stopwatch;
     }
 
     public function onCommandStart(ConsoleCommandEvent $event): void
@@ -37,7 +40,7 @@ class ConsoleEventListener
             return;
         }
 
-        $this->logger->info('Command started: ' . $event->getCommand()->getName(), $this->getContext($event));
+        $this->stopwatch->start(spl_object_hash($event->getCommand()));
     }
 
     /**
@@ -47,7 +50,7 @@ class ConsoleEventListener
     public function onCommandError(ConsoleErrorEvent $event): void
     {
         $this->logger->error($event->getError()->getMessage(), array_merge(
-            $this->getContext($event, true),
+            $this->getContext($event),
             ['exception' => $event->getError()],
         ));
     }
@@ -63,13 +66,13 @@ class ConsoleEventListener
             return;
         }
 
-        $this->logger->info('Command finished success : ' . $event->getCommand()->getName(), $this->getContext($event, true));
+        $this->logger->info('Command executed: ' . $event->getCommand()->getName(), $this->getContext($event));
     }
 
     /**
      * @return array{command: string, options: mixed[], arguments: mixed[]}
      */
-    private function getContext(ConsoleEvent $event, bool $withOutput = false): array
+    private function getContext(ConsoleEvent $event): array
     {
         $context = [
             'command' => (string) $event->getInput(),
@@ -77,8 +80,11 @@ class ConsoleEventListener
             'arguments' => $this->normalizeArguments($event->getInput()),
         ];
 
-        if ($withOutput && $event->getCommand()) {
+        if ($event->getCommand()) {
+            $stopwatchEvent = $this->stopwatch->stop(spl_object_hash($event->getCommand()));
+
             $context['output'] = $this->getOutput($event->getCommand());
+            $context['stopwatch'] = sprintf('%.2F MiB - %s', $stopwatchEvent->getMemory() / 1024 / 1024, $this->formatDuration($stopwatchEvent->getDuration()));
         }
 
         return $context;
@@ -122,5 +128,20 @@ class ConsoleEventListener
         }
 
         return null;
+    }
+
+    private function formatDuration(float $ms): string
+    {
+        // en ms
+        if ($ms < 1000) {
+            return $ms . ' ms';
+        }
+
+        // en minutes si on a dépassé 60 secondes
+        if ($ms > 60000) {
+            return round($ms / 60000, 2) . ' min';
+        }
+
+        return round($ms / 1000, 2) . ' s';
     }
 }

@@ -32,6 +32,7 @@ class JlogBundle extends AbstractBundle
             ->class(ConsoleEventListener::class)
             ->args([
                 '$logger' => service('monolog.logger.'.$config['console_channel']),
+                '$stopwatch' => service('debug.stopwatch'),
             ])
             ->tag('kernel.event_listener', ['event' => 'console.command', 'method' => 'onCommandStart'])
             ->tag('kernel.event_listener', ['event' => 'console.error', 'method' => 'onCommandError'])
