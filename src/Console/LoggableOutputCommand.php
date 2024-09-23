@@ -34,4 +34,12 @@ abstract class LoggableOutputCommand extends Command
             return $this->execute($input, $this->getLoggableOutput());
         });
     }
+
+    /**
+     * @return string|null
+     */
+    public function getTerminateLogMessage(): ?string
+    {
+        return null;
+    }
 }

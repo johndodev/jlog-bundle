@@ -62,11 +62,13 @@ class ConsoleEventListener
             return;
         }
 
-        if (!$event->getCommand() instanceof LoggableOutputCommand) {
+        $command = $event->getCommand();
+
+        if (!$command instanceof LoggableOutputCommand) {
             return;
         }
 
-        $this->logger->info('Command executed: ' . $event->getCommand()->getName(), $this->getContext($event));
+        $this->logger->info($command->getTerminateLogMessage() ?: ('Command executed: ' . $event->getCommand()->getName()), $this->getContext($event));
     }
 
     /**
