@@ -80,7 +80,7 @@ class ConsoleEventListener
             'arguments' => $this->normalizeArguments($event->getInput()),
         ];
 
-        if ($event->getCommand()) {
+        if ($event->getCommand() && $event->getCommand() instanceof LoggableOutputCommand) {
             $stopwatchEvent = $this->stopwatch->stop(spl_object_hash($event->getCommand()));
 
             $context['output'] = $this->getOutput($event->getCommand());
