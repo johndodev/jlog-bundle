@@ -38,7 +38,7 @@ abstract class LoggableOutputCommand extends Command
     /**
      * @return string|null
      */
-    public function getTerminateLogMessage(): ?string
+    public function getTerminateLogMessage(InputInterface $input, OutputInterface $output): ?string
     {
         return null;
     }

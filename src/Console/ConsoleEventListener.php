@@ -68,7 +68,7 @@ class ConsoleEventListener
             return;
         }
 
-        $this->logger->info($command->getTerminateLogMessage() ?: ('Command executed: ' . $event->getCommand()->getName()), $this->getContext($event));
+        $this->logger->info($command->getTerminateLogMessage($event->getInput(), $event->getOutput()) ?: ('Command executed: ' . $event->getCommand()->getName()), $this->getContext($event));
     }
 
     /**
