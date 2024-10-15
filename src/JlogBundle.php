@@ -19,7 +19,7 @@ class JlogBundle extends AbstractBundle
 {
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        if (!isset($config['project_api_key'])) {
+        if (empty($config['project_api_key'])) {
             return;
         }
 
